@@ -1,9 +1,11 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // In-memory storage (for production, use a database like MongoDB)
 let questions = [];
