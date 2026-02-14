@@ -765,7 +765,16 @@
             });
             
             // Save to localStorage
-            localStorage.setItem('questions', JSON.stringify(questions));
+         // Try to post to server (optional, doesn't block if server is down)
+fetch("https://deesaat-quizs.onrender.com/questions", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    question: questionText,
+    answer: yesterdayAnswer || null
+  })
+})
+          
             
             // Try to post to server (optional, doesn't block if server is down)
             fetch("https://deesat-quiz.onrender.com/questions", {
