@@ -805,7 +805,36 @@ fetch("https://deesaat-quizs.onrender.com", {
         }
 
         function submitAnswer(questionId) {
-            const answer = document.getElementById('answer-' + questionId).value.trim();
+            function submitQuestion() {
+  const questionText = document.getElementById("newQuestion").value;
+  const yesterdayAnswer = document.getElementById("yesterdayAnswer").value;
+
+  if (!questionText) {
+    alert("Question cannot be empty!");
+    return;
+  }
+
+  fetch("https://deesaat-quizs.onrender.com/questions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      question: questionText,
+      answer: yesterdayAnswer || null
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert("Question saved!");
+    document.getElementById("newQuestion").value = "";
+    document.getElementById("yesterdayAnswer").value = "";
+  })
+  .catch(err => {
+    alert("Server error");
+    console.log(err);
+  });
+}
             
             if (!answer) {
                 alert('Please write your answer!');
