@@ -1,16 +1,15 @@
 const express = require("express");
-const path = require("path");
 const cors = require("cors");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
 
-// In-memory storage (for production, use a database like MongoDB)
+// In-memory storage
 let questions = [];
 let studentAnswers = [];
 let mediaFiles = [];
+let studentPhones = {};
 
 // ============ QUESTIONS ENDPOINTS ============
 
@@ -45,9 +44,14 @@ app.post("/questions", (req, res) => {
     });
 });
 
-// Homepage
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+// Get a specific question by ID
+app.get("/questions/:id", (req, res) => {
+    const question = questions.find(q => q.id === parseInt(req.params.id));
+    if (question) {
+        res.json(question);
+    } else {
+        res.status(404).json({ error: "Question not found" });
+    }
 });
 
 // Update a question's answer
@@ -153,6 +157,29 @@ app.get("/media/latest", (req, res) => {
     }
 });
 
+// ============ STUDENT PHONES ENDPOINTS ============
+
+// Get all student phone numbers
+app.get("/phones", (req, res) => {
+    res.json(studentPhones);
+});
+
+// Register/Update student phone
+app.post("/phones", (req, res) => {
+    const { pin, name, phone } = req.body;
+    
+    studentPhones[pin] = {
+        name,
+        phone,
+        lastLogin: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+    };
+    
+    res.json({ 
+        success: true, 
+        message: "Phone registered successfully" 
+    });
+});
+
 // ============ STATISTICS ENDPOINTS ============
 
 // Get statistics
@@ -161,13 +188,14 @@ app.get("/stats", (req, res) => {
         totalQuestions: questions.length,
         totalAnswers: studentAnswers.length,
         totalMedia: mediaFiles.length,
+        totalStudents: Object.keys(studentPhones).length,
         uniqueStudents: [...new Set(studentAnswers.map(a => a.studentPin))].length
     };
     
     res.json(stats);
 });
 
-// ============ HEALTH CHECK ============
+// ============ HEALTH CHECK & INFO ============
 
 app.get("/", (req, res) => {
     res.json({ 
@@ -178,13 +206,18 @@ app.get("/", (req, res) => {
             questions: "/questions",
             answers: "/answers",
             media: "/media",
+            phones: "/phones",
             stats: "/stats"
         }
     });
 });
 
 app.get("/health", (req, res) => {
-    res.json({ status: "OK", timestamp: new Date().toISOString() });
+    res.json({ 
+        status: "OK", 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
 });
 
 // ============ SERVER START ============
@@ -198,4 +231,5 @@ app.listen(PORT, () => {
 ║     Server running on port ${PORT}          ║
 ╚═══════════════════════════════════════════╝
     `);
+    console.log(`Visit: http://localhost:${PORT}`);
 });
