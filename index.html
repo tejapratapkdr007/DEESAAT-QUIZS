@@ -742,19 +742,37 @@
         }
 
         // ============ CHANGE 2: Post question to server ============
-        function postQuestion() {
-            const questionText = document.getElementById('newQuestion').value.trim();
-            const yesterdayAnswer = document.getElementById('yesterdayAnswer').value.trim();
-            
-            if (!questionText) {
-                alert('Please enter a question!');
-                return;
-            }
-            
-            // Update yesterday's question answer if provided
-            if (yesterdayAnswer && questions.length > 0) {
-                questions[questions.length - 1].answer = yesterdayAnswer;
-            }
+       function postQuestion() {
+  const questionText = document.getElementById("newQuestion").value.trim();
+  const yesterdayAnswer = document.getElementById("yesterdayAnswer").value.trim();
+
+  if (!questionText) {
+    alert("Please enter a question!");
+    return;
+  }
+
+  fetch("https://deesaat-quizs.onrender.com/questions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      question: questionText,
+      answer: yesterdayAnswer || null
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert("Question posted successfully!");
+      console.log(data);
+      document.getElementById("newQuestion").value = "";
+      document.getElementById("yesterdayAnswer").value = "";
+    })
+    .catch(err => {
+      console.error("Server error:", err);
+      alert("Server error. Check console.");
+    });
+}
             
             // Add new question
             
