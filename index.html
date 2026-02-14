@@ -757,12 +757,27 @@
             }
             
             // Add new question
-            questions.push({
-                id: Date.now(),
-                question: questionText,
-                answer: null,
-                date: new Date().toLocaleString()
-            });
+            
+                fetch("https://deesaat-quizs.onrender.com/questions", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    question: questionText,
+    answer: yesterdayAnswer || null
+  })
+})
+.then(res => res.json())
+.then(data => {
+  alert("Question posted successfully!");
+  console.log(data);
+})
+.catch(err => {
+  console.error("Server error:", err);
+  alert("Server error. Check console.");
+});
+            
             
             // Save to localStorage
          // Try to post to server (optional, doesn't block if server is down)
