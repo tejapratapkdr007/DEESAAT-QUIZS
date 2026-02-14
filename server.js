@@ -43,14 +43,9 @@ app.post("/questions", (req, res) => {
     });
 });
 
-// Get a specific question by ID
-app.get("/questions/:id", (req, res) => {
-    const question = questions.find(q => q.id === parseInt(req.params.id));
-    if (question) {
-        res.json(question);
-    } else {
-        res.status(404).json({ error: "Question not found" });
-    }
+// Homepage
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
 });
 
 // Update a question's answer
